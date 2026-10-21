@@ -141,7 +141,7 @@ body {
 /* ---- Player Screen ---- */
 
 #player-screen {
-  --cell: min(8vh, 18vw, 80px);
+  --cell: min(8vh, 15vw, 80px);
   --tilt: 40deg;
   display: flex;
   flex-direction: column;
@@ -272,4 +272,150 @@ body {
 .bench-cell .unit img {
   bottom: 0;
   width: 120%;
+}
+
+/* ---- Player layout & The Tavern ---- */
+
+.player-layout {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2rem;
+  width: 100%;
+}
+
+.board-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tavern {
+  width: min(100%, 340px);
+  padding: 0.9rem;
+  background: linear-gradient(#3b2a1c, #22170f);
+  border: 3px solid #7a5a2a;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.tavern-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.8rem;
+}
+
+.tavern-title {
+  font-size: 1.5rem;
+  color: #e8c66a;
+  text-shadow: 0 2px 0 #5a3e12;
+}
+
+.gold {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #f2c94c;
+}
+
+.gold img {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.shop {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.shop-slot.empty {
+  height: 76px;
+  border: 2px dashed rgba(232, 198, 106, 0.25);
+  border-radius: 8px;
+}
+
+.shop-card {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  height: 76px;
+  padding: 5px 8px 5px 5px;
+  font-family: inherit;
+  color: #f0e6d2;
+  text-align: left;
+  background: #1e1628;
+  border: 3px solid var(--rarity);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+
+.shop-card:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 0 12px var(--rarity);
+}
+
+.shop-card:disabled {
+  cursor: not-allowed;
+  filter: grayscale(0.7) brightness(0.6);
+}
+
+.shop-portrait {
+  width: 60px;
+  height: 60px;
+  border-radius: 5px;
+  border: 2px solid var(--rarity);
+  object-fit: cover;
+}
+
+.shop-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.shop-name {
+  font-size: 1.05rem;
+  font-weight: bold;
+  margin-bottom: 0.2rem;
+}
+
+.shop-traits {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.1rem 0.6rem;
+  font-size: 0.8rem;
+  color: #c9b48a;
+}
+
+.shop-traits li {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.shop-traits img {
+  width: 16px;
+  height: 16px;
+}
+
+.shop-cost {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #f2c94c;
+}
+
+.shop-cost img {
+  width: 20px;
+  height: 20px;
 }

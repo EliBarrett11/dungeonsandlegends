@@ -67,9 +67,30 @@ const GRID_ROWS = 7;
 const GRID_COLS = 3;
 const BENCH_SIZE = 5;
 
-const UNIT_TYPES = {
-  "DL-001": { id: "DL-001", image: "assets/units/DL-001.png" },
+const TRAITS = {
+  aasimar: { name: "Aasimar", icon: "assets/traits/aasimar.svg" },
+  barbarian: { name: "Barbarian", icon: "assets/traits/barbarian.svg" },
+  acolyte: { name: "Acolyte", icon: "assets/traits/acolyte.svg" },
 };
+
+const RARITY_BORDERS = {
+  common: "#9e9e9e",
+};
+
+const UNIT_TYPES = {
+  "DL-001": {
+    id: "DL-001",
+    name: "DL-001",
+    image: "assets/units/DL-001.png",
+    portrait: "assets/portraits/DL-001.jpg",
+    traits: ["aasimar", "barbarian", "acolyte"],
+    cost: 1,
+    rarity: "common",
+  },
+};
+
+const STARTING_GOLD = 3;
+const SHOP_SIZE = 5;
 
 const playerScreen = document.getElementById("player-screen");
 const teamGrid = document.getElementById("team-grid");
@@ -184,6 +205,93 @@ function onDragEnd(e) {
   });
   drag = null;
   renderUnits();
+  renderShop();
+}
+
+// ---- The Tavern (shop) ----
+
+const shopEl = document.getElementById("shop");
+const goldEl = document.getElementById("gold-amount");
+
+let gold = 0;
+const shop = new Array(SHOP_SIZE).fill(null);
+
+function renderGold() {
+  goldEl.textContent = gold;
+}
+
+function renderShop() {
+  shopEl.innerHTML = "";
+  const benchFull = !bench.includes(null);
+
+  shop.forEach((type, i) => {
+    const li = document.createElement("li");
+    li.className = "shop-slot";
+
+    if (!type) {
+      li.classList.add("empty");
+      shopEl.appendChild(li);
+      return;
+    }
+
+    const card = document.createElement("button");
+    card.className = "shop-card";
+    card.style.setProperty("--rarity", RARITY_BORDERS[type.rarity]);
+    card.disabled = gold < type.cost || benchFull;
+    card.title = benchFull ? "Your bench is full" : gold < type.cost ? "Not enough gold" : `Buy ${type.name}`;
+
+    const portrait = document.createElement("img");
+    portrait.className = "shop-portrait";
+    portrait.src = type.portrait;
+    portrait.alt = type.name;
+
+    const info = document.createElement("div");
+    info.className = "shop-info";
+
+    const name = document.createElement("div");
+    name.className = "shop-name";
+    name.textContent = type.name;
+
+    const traits = document.createElement("ul");
+    traits.className = "shop-traits";
+    type.traits.forEach((traitId) => {
+      const trait = TRAITS[traitId];
+      const traitEl = document.createElement("li");
+      const icon = document.createElement("img");
+      icon.src = trait.icon;
+      icon.alt = "";
+      traitEl.append(icon, trait.name);
+      traits.appendChild(traitEl);
+    });
+
+    info.append(name, traits);
+
+    const cost = document.createElement("div");
+    cost.className = "shop-cost";
+    const coin = document.createElement("img");
+    coin.src = "assets/icons/gold.svg";
+    coin.alt = "Gold";
+    cost.append(coin, type.cost);
+
+    card.append(portrait, info, cost);
+    card.addEventListener("click", () => buyUnit(i));
+    li.appendChild(card);
+    shopEl.appendChild(li);
+  });
+}
+
+function buyUnit(shopIndex) {
+  const type = shop[shopIndex];
+  const benchIndex = bench.indexOf(null);
+  if (!type || gold < type.cost || benchIndex === -1) return;
+
+  gold -= type.cost;
+  bench[benchIndex] = createUnit(type.id);
+  shop[shopIndex] = null;
+
+  renderGold();
+  renderShop();
+  renderUnits();
 }
 
 // The tilted grid's on-screen size differs from its layout size, so size the
@@ -209,10 +317,14 @@ function openPlayerScreen() {
   grid.fill(null);
   bench.fill(null);
   grid[0] = createUnit("DL-001");
+  shop.fill(UNIT_TYPES["DL-001"]);
+  gold = STARTING_GOLD;
 
   buildCells(teamGrid, "grid", GRID_ROWS * GRID_COLS);
   buildCells(benchEl, "bench", BENCH_SIZE);
   renderUnits();
+  renderGold();
+  renderShop();
   showScreen(playerScreen);
   fitBoard();
 }

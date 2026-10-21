@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Two crossed battle axes -->
+  <g stroke="#8a5a2b" stroke-width="5" stroke-linecap="round">
+    <line x1="14" y1="58" x2="50" y2="10"/>
+    <line x1="50" y1="58" x2="14" y2="10"/>
+  </g>
+  <path fill="#e8c66a" d="M44 4c8 2 14 8 16 16-5-1-9 0-12 3l-7-7c3-3 4-7 3-12z"/>
+  <path fill="#e8c66a" d="M20 4C12 6 6 12 4 20c5-1 9 0 12 3l7-7c-3-3-4-7-3-12z"/>
+</svg>

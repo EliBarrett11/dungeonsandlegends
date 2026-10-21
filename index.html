@@ -20,15 +20,29 @@
 
   <main id="player-screen" class="screen hidden">
     <h2 id="player-name" class="player-name"></h2>
-    <section class="board-area">
-      <div class="board-stage">
-        <div id="team-grid" class="team-grid"></div>
+    <div class="player-layout">
+      <div class="board-column">
+        <section class="board-area">
+          <div class="board-stage">
+            <div id="team-grid" class="team-grid"></div>
+          </div>
+        </section>
+        <section class="bench-area">
+          <h3 class="bench-label">Bench</h3>
+          <div id="bench" class="bench"></div>
+        </section>
       </div>
-    </section>
-    <section class="bench-area">
-      <h3 class="bench-label">Bench</h3>
-      <div id="bench" class="bench"></div>
-    </section>
+      <aside class="tavern">
+        <header class="tavern-header">
+          <h3 class="tavern-title">The Tavern</h3>
+          <div class="gold" title="Gold">
+            <img src="assets/icons/gold.svg" alt="Gold">
+            <span id="gold-amount">0</span>
+          </div>
+        </header>
+        <ol id="shop" class="shop"></ol>
+      </aside>
+    </div>
   </main>
 
   <script src="game.js"></script>
