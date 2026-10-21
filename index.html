@@ -7,9 +7,79 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main id="start-menu">
+  <main id="start-menu" class="screen">
     <h1 class="title">Dungeons &amp; Legends</h1>
     <button id="new-game-btn" class="menu-button">New Game</button>
   </main>
+
+  <main id="lobby" class="screen hidden">
+    <h2 class="screen-heading">Match Lobby</h2>
+    <ol id="slot-list" class="slot-list"></ol>
+    <button id="start-match-btn" class="menu-button">Start Match</button>
+  </main>
+
+  <main id="player-screen" class="screen hidden">
+    <h2 id="player-name" class="player-name"></h2>
+    <div class="renown">
+      <div class="renown-level">Renown <span id="renown-level">1</span></div>
+      <div class="fame-progress">
+        <div class="fame-bar"><div id="fame-fill" class="fame-fill"></div></div>
+        <div id="fame-text" class="fame-text"></div>
+      </div>
+    </div>
+    <div class="player-layout">
+      <div class="side-column">
+        <aside class="standings">
+          <h3 class="standings-title">Players</h3>
+          <ol id="standings-list" class="standings-list"></ol>
+        </aside>
+        <aside class="traits-panel">
+          <h3 class="standings-title">Active Traits</h3>
+          <ul id="active-traits" class="active-traits"></ul>
+        </aside>
+      </div>
+      <div class="board-column">
+        <div id="field-limit" class="field-limit"></div>
+        <section class="board-area">
+          <div class="board-stage">
+            <div id="team-grid" class="team-grid"></div>
+          </div>
+        </section>
+        <section class="bench-area">
+          <h3 class="bench-label">Bench</h3>
+          <div id="bench" class="bench"></div>
+        </section>
+        <button id="ready-btn" class="menu-button ready-button">Ready</button>
+      </div>
+      <div class="right-column">
+        <aside class="tavern">
+          <header class="tavern-header">
+            <h3 class="tavern-title">The Tavern</h3>
+            <div class="gold" title="Gold">
+              <img src="assets/icons/gold.svg" alt="Gold">
+              <span id="gold-amount">0</span>
+            </div>
+          </header>
+          <ol id="shop" class="shop"></ol>
+          <div class="bard">
+            <img class="bard-icon" src="assets/icons/bard.svg" alt="">
+            <div class="bard-info">
+              <div class="bard-name">The Bard</div>
+              <div class="bard-offer">
+                +4 <img src="assets/icons/fame.svg" alt=""> Fame for 4 <img src="assets/icons/gold.svg" alt=""> Gold
+              </div>
+            </div>
+            <button id="bard-btn" class="bard-button">Play my song</button>
+          </div>
+        </aside>
+        <aside class="inventory-panel">
+          <h3 class="standings-title">Inventory</h3>
+          <div id="inventory" class="inventory"></div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <script src="game.js"></script>
 </body>
 </html>
