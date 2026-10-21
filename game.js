@@ -66,6 +66,7 @@ document.getElementById("new-game-btn").addEventListener("click", () => {
 const GRID_ROWS = 7;
 const GRID_COLS = 3;
 const BENCH_SIZE = 5;
+const INVENTORY_SIZE = 12;
 
 const TRAITS = {
   aasimar: { name: "Aasimar", icon: "assets/traits/aasimar.svg" },
@@ -452,6 +453,34 @@ bardBtn.addEventListener("click", () => {
   renderRenown();
 });
 
+// ---- Inventory & Ready ----
+
+const inventoryEl = document.getElementById("inventory");
+const readyBtn = document.getElementById("ready-btn");
+
+const inventory = new Array(INVENTORY_SIZE).fill(null);
+let ready = false;
+
+function renderInventory() {
+  inventoryEl.innerHTML = "";
+  inventory.forEach((item, i) => {
+    const slot = document.createElement("div");
+    slot.className = "inventory-slot";
+    slot.dataset.index = i;
+    inventoryEl.appendChild(slot);
+  });
+}
+
+function renderReady() {
+  readyBtn.classList.toggle("is-ready", ready);
+  readyBtn.textContent = ready ? "Ready \u2713" : "Ready";
+}
+
+readyBtn.addEventListener("click", () => {
+  ready = !ready;
+  renderReady();
+});
+
 // The tilted grid's on-screen size differs from its layout size, so size the
 // board area to match what is actually drawn.
 function fitBoard() {
@@ -481,6 +510,8 @@ function openPlayerScreen() {
   gold = STARTING_GOLD;
   renown = 1;
   fame = 0;
+  inventory.fill(null);
+  ready = false;
 
   buildCells(teamGrid, "grid", GRID_ROWS * GRID_COLS);
   buildCells(benchEl, "bench", BENCH_SIZE);
@@ -488,6 +519,8 @@ function openPlayerScreen() {
   renderGold();
   renderShop();
   renderRenown();
+  renderInventory();
+  renderReady();
   showScreen(playerScreen);
   fitBoard();
 }

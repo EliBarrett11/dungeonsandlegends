@@ -48,27 +48,34 @@
           <h3 class="bench-label">Bench</h3>
           <div id="bench" class="bench"></div>
         </section>
+        <button id="ready-btn" class="menu-button ready-button">Ready</button>
       </div>
-      <aside class="tavern">
-        <header class="tavern-header">
-          <h3 class="tavern-title">The Tavern</h3>
-          <div class="gold" title="Gold">
-            <img src="assets/icons/gold.svg" alt="Gold">
-            <span id="gold-amount">0</span>
-          </div>
-        </header>
-        <ol id="shop" class="shop"></ol>
-        <div class="bard">
-          <img class="bard-icon" src="assets/icons/bard.svg" alt="">
-          <div class="bard-info">
-            <div class="bard-name">The Bard</div>
-            <div class="bard-offer">
-              +4 <img src="assets/icons/fame.svg" alt=""> Fame for 4 <img src="assets/icons/gold.svg" alt=""> Gold
+      <div class="right-column">
+        <aside class="tavern">
+          <header class="tavern-header">
+            <h3 class="tavern-title">The Tavern</h3>
+            <div class="gold" title="Gold">
+              <img src="assets/icons/gold.svg" alt="Gold">
+              <span id="gold-amount">0</span>
             </div>
+          </header>
+          <ol id="shop" class="shop"></ol>
+          <div class="bard">
+            <img class="bard-icon" src="assets/icons/bard.svg" alt="">
+            <div class="bard-info">
+              <div class="bard-name">The Bard</div>
+              <div class="bard-offer">
+                +4 <img src="assets/icons/fame.svg" alt=""> Fame for 4 <img src="assets/icons/gold.svg" alt=""> Gold
+              </div>
+            </div>
+            <button id="bard-btn" class="bard-button">Play my song</button>
           </div>
-          <button id="bard-btn" class="bard-button">Play my song</button>
-        </div>
-      </aside>
+        </aside>
+        <aside class="inventory-panel">
+          <h3 class="standings-title">Inventory</h3>
+          <div id="inventory" class="inventory"></div>
+        </aside>
+      </div>
     </div>
   </main>
 
