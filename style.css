@@ -740,13 +740,6 @@ body {
   background: #3b7449;
 }
 
-.ready-button.is-ready {
-  color: #10240f;
-  background: #6fdc7d;
-  border-color: #c8ffd0;
-  box-shadow: 0 0 16px rgba(111, 220, 125, 0.6);
-}
-
 /* ---- Field limit ---- */
 
 .field-limit {
@@ -780,4 +773,272 @@ body {
 .cell.drop-blocked {
   background: rgba(255, 80, 80, 0.3);
   border-color: #ff6b6b;
+}
+
+/* ---- Battle Screen ---- */
+
+.battle-title,
+.arena-area {
+  display: none;
+}
+
+#player-screen.battle-mode {
+  --cell: min(6vh, 9vw, 54px);
+  --arena-cell: min(8vh, 11vw, 76px);
+}
+
+#player-screen.battle-mode #player-name,
+#player-screen.battle-mode .board-area,
+#player-screen.battle-mode .field-limit,
+#player-screen.battle-mode .ready-button {
+  display: none;
+}
+
+#player-screen.battle-mode .battle-title {
+  display: block;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+}
+
+#player-screen.battle-mode .arena-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#player-screen.battle-mode .player-layout {
+  gap: 1.2rem;
+}
+
+#player-screen.battle-mode .board-column {
+  flex: 1;
+  min-width: 0;
+}
+
+.arena-labels {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.4rem;
+  font-weight: bold;
+}
+
+.arena-side {
+  min-width: 8rem;
+  text-align: right;
+  color: #9fd3ff;
+}
+
+.arena-side.foe {
+  text-align: left;
+  color: #ff9a8a;
+}
+
+.arena-vs {
+  padding: 0.1rem 0.6rem;
+  color: #1e1628;
+  background: #e8c66a;
+  border-radius: 4px;
+}
+
+.arena-fit {
+  margin-top: calc(var(--arena-cell) * 0.6);
+}
+
+.arena-stage {
+  perspective: 1100px;
+}
+
+.arena-grid {
+  grid-template-columns: repeat(6, var(--arena-cell));
+  grid-template-rows: repeat(7, var(--arena-cell));
+  background: linear-gradient(90deg, #22303d 0%, #2b2420 49.5%, #e8c66a 49.5%, #e8c66a 50.5%, #3a2220 50.5%, #2b1a18 100%);
+}
+
+.arena-cell {
+  position: relative;
+  border-radius: 4px;
+  transform-style: preserve-3d;
+}
+
+.arena-cell.mine {
+  background: rgba(120, 190, 255, 0.08);
+  border: 1px solid rgba(120, 190, 255, 0.35);
+}
+
+.arena-cell.foe {
+  background: rgba(255, 120, 100, 0.08);
+  border: 1px solid rgba(255, 120, 100, 0.35);
+}
+
+.unit.static {
+  cursor: default;
+}
+
+.arena-cell .unit img {
+  transform-origin: 50% 100%;
+  transform: translateX(-50%) rotateX(calc(var(--tilt) * -1));
+  width: 150%;
+}
+
+/* Opponents face left, toward the player's field. */
+.arena-cell.foe .unit img {
+  transform: translateX(-50%) rotateX(calc(var(--tilt) * -1)) scaleX(-1);
+}
+
+/* Compact side interfaces so the battle is the focus. */
+#player-screen.battle-mode .side-column {
+  width: 190px;
+  gap: 0.6rem;
+}
+
+#player-screen.battle-mode .right-column {
+  width: 240px;
+  gap: 0.6rem;
+}
+
+#player-screen.battle-mode .standings,
+#player-screen.battle-mode .traits-panel,
+#player-screen.battle-mode .inventory-panel,
+#player-screen.battle-mode .tavern {
+  padding: 0.5rem;
+  border-width: 2px;
+}
+
+#player-screen.battle-mode .standings-title,
+#player-screen.battle-mode .tavern-title {
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
+}
+
+#player-screen.battle-mode .tavern-header {
+  margin-bottom: 0.4rem;
+}
+
+#player-screen.battle-mode .gold {
+  font-size: 1rem;
+}
+
+#player-screen.battle-mode .standings-list,
+#player-screen.battle-mode .active-traits,
+#player-screen.battle-mode .shop {
+  gap: 0.25rem;
+}
+
+#player-screen.battle-mode .standing {
+  padding: 0.15rem 0.4rem;
+  font-size: 0.8rem;
+}
+
+#player-screen.battle-mode .health-bar {
+  height: 3px;
+}
+
+#player-screen.battle-mode .active-trait {
+  padding: 0.2rem 0.35rem;
+  font-size: 0.8rem;
+}
+
+#player-screen.battle-mode .trait-icon {
+  width: 20px;
+  height: 20px;
+}
+
+#player-screen.battle-mode .trait-milestones {
+  font-size: 0.65rem;
+}
+
+#player-screen.battle-mode .shop-card,
+#player-screen.battle-mode .shop-slot.empty {
+  height: 48px;
+}
+
+#player-screen.battle-mode .shop-card {
+  gap: 0.4rem;
+  padding: 3px 6px 3px 3px;
+  border-width: 2px;
+}
+
+#player-screen.battle-mode .shop-portrait {
+  width: 38px;
+  height: 38px;
+}
+
+#player-screen.battle-mode .shop-name {
+  font-size: 0.85rem;
+  margin-bottom: 0.1rem;
+}
+
+/* Trait icons only, names show on hover. */
+#player-screen.battle-mode .shop-traits {
+  font-size: 0;
+  gap: 0.25rem;
+}
+
+#player-screen.battle-mode .shop-traits img {
+  width: 14px;
+  height: 14px;
+}
+
+#player-screen.battle-mode .shop-cost {
+  font-size: 0.95rem;
+}
+
+#player-screen.battle-mode .shop-cost img {
+  width: 15px;
+  height: 15px;
+}
+
+#player-screen.battle-mode .bard {
+  margin-top: 0.4rem;
+  padding-top: 0.4rem;
+  gap: 0.4rem;
+}
+
+#player-screen.battle-mode .bard-icon {
+  width: 28px;
+  height: 28px;
+}
+
+#player-screen.battle-mode .bard-name {
+  font-size: 0.85rem;
+}
+
+#player-screen.battle-mode .bard-offer {
+  font-size: 0.65rem;
+}
+
+#player-screen.battle-mode .bard-button {
+  font-size: 0.75rem;
+  padding: 0.3rem 0.45rem;
+}
+
+#player-screen.battle-mode .inventory {
+  gap: 4px;
+}
+
+#player-screen.battle-mode .renown {
+  padding: 0.2rem 0.7rem;
+  font-size: 0.85rem;
+}
+
+#player-screen.battle-mode .bench-label {
+  font-size: 0.8rem;
+}
+
+#player-screen.battle-mode .bench {
+  gap: 4px;
+  padding: 5px;
+  border-width: 2px;
+}
+
+@media (max-width: 700px) {
+  #player-screen.battle-mode .side-column,
+  #player-screen.battle-mode .right-column {
+    width: min(100%, 340px);
+  }
+
+  #player-screen.battle-mode .board-column {
+    flex-basis: 100%;
+  }
 }

@@ -20,6 +20,7 @@
 
   <main id="player-screen" class="screen hidden">
     <h2 id="player-name" class="player-name"></h2>
+    <h2 id="battle-title" class="player-name battle-title"></h2>
     <div class="renown">
       <div class="renown-level">Renown <span id="renown-level">1</span></div>
       <div class="fame-progress">
@@ -43,6 +44,18 @@
         <section class="board-area">
           <div class="board-stage">
             <div id="team-grid" class="team-grid"></div>
+          </div>
+        </section>
+        <section id="arena-area" class="arena-area">
+          <div class="arena-labels">
+            <span id="arena-me" class="arena-side"></span>
+            <span class="arena-vs">VS</span>
+            <span id="arena-foe" class="arena-side foe"></span>
+          </div>
+          <div class="arena-fit">
+            <div class="board-stage arena-stage">
+              <div id="arena-grid" class="team-grid arena-grid"></div>
+            </div>
           </div>
         </section>
         <section class="bench-area">

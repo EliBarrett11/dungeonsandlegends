@@ -93,6 +93,16 @@ const UNIT_TYPES = {
   },
 };
 
+const MONSTER_TYPES = {
+  goblin: { id: "goblin", name: "Goblin", image: "assets/monsters/goblin.png" },
+};
+
+// Each Floor/Room lists the monsters every player faces there, with their
+// cell index on the opponent's 7x3 field (row * 3 + column, column 2 = front).
+const ROOMS = {
+  "1-1": { floor: 1, room: 1, monsters: [{ type: "goblin", index: 3 * GRID_COLS + 2 }] },
+};
+
 const STARTING_GOLD = 3;
 const STARTING_HEALTH = 100;
 
@@ -241,6 +251,7 @@ function cellAtPoint(x, y) {
   let bestDist = Infinity;
   document.querySelectorAll(".cell").forEach((cell) => {
     const r = cell.getBoundingClientRect();
+    if (r.width === 0) return; // hidden, e.g. the team grid during battle
     if (x < r.left || x > r.right || y < r.top || y > r.bottom) return;
     const dist = Math.hypot(x - (r.left + r.width / 2), y - (r.top + r.height / 2));
     if (dist < bestDist) {
@@ -416,6 +427,7 @@ function renderShop() {
       const icon = document.createElement("img");
       icon.src = trait.icon;
       icon.alt = "";
+      traitEl.title = trait.name;
       traitEl.append(icon, trait.name);
       traits.appendChild(traitEl);
     });
@@ -501,7 +513,6 @@ const inventoryEl = document.getElementById("inventory");
 const readyBtn = document.getElementById("ready-btn");
 
 const inventory = new Array(INVENTORY_SIZE).fill(null);
-let ready = false;
 
 function renderInventory() {
   inventoryEl.innerHTML = "";
@@ -513,30 +524,78 @@ function renderInventory() {
   });
 }
 
-function renderReady() {
-  readyBtn.classList.toggle("is-ready", ready);
-  readyBtn.textContent = ready ? "Ready \u2713" : "Ready";
+// ---- Battle Screen ----
+
+const arenaGrid = document.getElementById("arena-grid");
+let currentRoom = null;
+
+// The arena is 7 rows x 6 columns: the player's field on the left (columns
+// 0-2) and the opponent's mirrored field on the right (columns 3-5).
+function renderArena(me) {
+  const foeGrid = new Array(GRID_ROWS * GRID_COLS).fill(null);
+  currentRoom.monsters.forEach((m) => {
+    foeGrid[m.index] = MONSTER_TYPES[m.type];
+  });
+
+  document.getElementById("arena-me").textContent = me.name;
+  document.getElementById("arena-foe").textContent = currentRoom.monsters
+    .map((m) => MONSTER_TYPES[m.type].name)
+    .join(", ");
+
+  arenaGrid.innerHTML = "";
+  for (let row = 0; row < GRID_ROWS; row++) {
+    for (let col = 0; col < GRID_COLS * 2; col++) {
+      const cell = document.createElement("div");
+      const isFoe = col >= GRID_COLS;
+      cell.className = `arena-cell ${isFoe ? "foe" : "mine"}`;
+
+      const fieldCol = isFoe ? GRID_COLS * 2 - 1 - col : col; // mirror the opponent's field
+      const occupant = isFoe ? foeGrid[row * GRID_COLS + fieldCol] : grid[row * GRID_COLS + fieldCol]?.type;
+      if (occupant) {
+        const unitEl = document.createElement("div");
+        unitEl.className = "unit static";
+        const img = document.createElement("img");
+        img.src = occupant.image;
+        img.alt = occupant.name;
+        img.draggable = false;
+        unitEl.appendChild(img);
+        cell.appendChild(unitEl);
+      }
+      arenaGrid.appendChild(cell);
+    }
+  }
 }
 
-readyBtn.addEventListener("click", () => {
-  ready = !ready;
-  renderReady();
-});
+function startBattle() {
+  currentRoom = ROOMS["1-1"];
+  const me = players.find((p) => p.type === "human") || players[0];
 
-// The tilted grid's on-screen size differs from its layout size, so size the
-// board area to match what is actually drawn.
-function fitBoard() {
-  const area = document.querySelector(".board-area");
-  const stage = document.querySelector(".board-stage");
+  document.getElementById("battle-title").textContent = `Floor-${currentRoom.floor}, Room-${currentRoom.room}`;
+  playerScreen.classList.add("battle-mode");
+  renderArena(me);
+  fitBoards();
+}
+
+readyBtn.addEventListener("click", startBattle);
+
+// A tilted grid's on-screen size differs from its layout size, so size its
+// area to match what is actually drawn.
+function fitBoard(area, stage, gridEl) {
   stage.style.top = "0px";
   const stageRect = stage.getBoundingClientRect();
-  const gridRect = teamGrid.getBoundingClientRect();
+  const gridRect = gridEl.getBoundingClientRect();
+  if (gridRect.height === 0) return; // not shown right now
   stage.style.top = `${stageRect.top - gridRect.top}px`;
   area.style.height = `${gridRect.height}px`;
 }
 
+function fitBoards() {
+  fitBoard(document.querySelector(".board-area"), document.querySelector(".board-area .board-stage"), teamGrid);
+  fitBoard(document.querySelector(".arena-fit"), document.querySelector(".arena-stage"), arenaGrid);
+}
+
 window.addEventListener("resize", () => {
-  if (!playerScreen.classList.contains("hidden")) fitBoard();
+  if (!playerScreen.classList.contains("hidden")) fitBoards();
 });
 
 function openPlayerScreen() {
@@ -553,7 +612,7 @@ function openPlayerScreen() {
   renown = 1;
   fame = 0;
   inventory.fill(null);
-  ready = false;
+  playerScreen.classList.remove("battle-mode");
 
   buildCells(teamGrid, "grid", GRID_ROWS * GRID_COLS);
   buildCells(benchEl, "bench", BENCH_SIZE);
@@ -562,9 +621,8 @@ function openPlayerScreen() {
   renderShop();
   renderRenown();
   renderInventory();
-  renderReady();
   showScreen(playerScreen);
-  fitBoard();
+  fitBoards();
 }
 
 document.getElementById("start-match-btn").addEventListener("click", openPlayerScreen);
