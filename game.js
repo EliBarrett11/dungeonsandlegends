@@ -145,6 +145,7 @@ function renderUnits() {
     cell.appendChild(unitEl);
   });
   renderActiveTraits();
+  renderFieldLimit();
 }
 
 // ---- Active Traits ----
@@ -250,11 +251,49 @@ function cellAtPoint(x, y) {
   return best;
 }
 
+// ---- Field limit: one unit on the grid per Renown level ----
+
+const fieldLimitEl = document.getElementById("field-limit");
+
+function fieldCount() {
+  return grid.filter(Boolean).length;
+}
+
+// A move is blocked only when it would add a unit to the grid (bench unit
+// into an empty grid cell) while the grid is already at its Renown limit.
+function isMoveAllowed(fromCell, toCell) {
+  const addsToField =
+    fromCell.dataset.area === "bench" && toCell.dataset.area === "grid" && !grid[toCell.dataset.index];
+  return !addsToField || fieldCount() < renown;
+}
+
+function renderFieldLimit() {
+  const count = fieldCount();
+  fieldLimitEl.textContent = `Units on field: ${count} / ${renown}`;
+  fieldLimitEl.classList.toggle("full", count >= renown);
+}
+
+let fieldLimitTimer = null;
+
+function flashFieldLimit() {
+  fieldLimitEl.textContent = `Field full! Reach Renown ${renown + 1} to field more units.`;
+  fieldLimitEl.classList.remove("warn");
+  void fieldLimitEl.offsetWidth; // restart the shake animation
+  fieldLimitEl.classList.add("warn");
+  clearTimeout(fieldLimitTimer);
+  fieldLimitTimer = setTimeout(() => {
+    fieldLimitEl.classList.remove("warn");
+    renderFieldLimit();
+  }, 2000);
+}
+
 function onDragMove(e) {
   moveGhost(e);
-  document.querySelectorAll(".cell.drop-target").forEach((c) => c.classList.remove("drop-target"));
+  document.querySelectorAll(".cell.drop-target, .cell.drop-blocked").forEach((c) => {
+    c.classList.remove("drop-target", "drop-blocked");
+  });
   const target = cellAtPoint(e.clientX, e.clientY);
-  if (target) target.classList.add("drop-target");
+  if (target) target.classList.add(isMoveAllowed(drag.from, target) ? "drop-target" : "drop-blocked");
 }
 
 function onDragEnd(e) {
@@ -263,7 +302,8 @@ function onDragEnd(e) {
   document.removeEventListener("pointercancel", onDragEnd);
 
   const target = e.type === "pointerup" ? cellAtPoint(e.clientX, e.clientY) : null;
-  if (target && target !== drag.from) {
+  const blocked = target && target !== drag.from && !isMoveAllowed(drag.from, target);
+  if (target && target !== drag.from && !blocked) {
     // Move into an empty cell, or swap with the unit already there.
     const fromArea = areas[drag.from.dataset.area];
     const toArea = areas[target.dataset.area];
@@ -273,12 +313,13 @@ function onDragEnd(e) {
   }
 
   drag.ghost.remove();
-  document.querySelectorAll(".dragging-from, .drop-target").forEach((c) => {
-    c.classList.remove("dragging-from", "drop-target");
+  document.querySelectorAll(".dragging-from, .drop-target, .drop-blocked").forEach((c) => {
+    c.classList.remove("dragging-from", "drop-target", "drop-blocked");
   });
   drag = null;
   renderUnits();
   renderShop();
+  if (blocked) flashFieldLimit();
 }
 
 // ---- Lobby player health ----
@@ -429,6 +470,7 @@ function gainFame(amount) {
 
 function renderRenown() {
   renownLevelEl.textContent = renown;
+  renderFieldLimit();
   const needed = FAME_TO_NEXT_LEVEL[renown];
   if (needed) {
     fameFillEl.style.width = `${(fame / needed) * 100}%`;
