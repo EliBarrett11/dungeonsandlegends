@@ -73,6 +73,9 @@ const TRAITS = {
   acolyte: { name: "Acolyte", icon: "assets/traits/acolyte.svg" },
 };
 
+// Number of unique units of a trait needed to reach each milestone.
+const TRAIT_MILESTONES = [2, 4, 6, 8, 10];
+
 const RARITY_BORDERS = {
   common: "#9e9e9e",
 };
@@ -139,6 +142,67 @@ function renderUnits() {
     unitEl.appendChild(img);
     unitEl.addEventListener("pointerdown", (e) => startDrag(e, cell));
     cell.appendChild(unitEl);
+  });
+  renderActiveTraits();
+}
+
+// ---- Active Traits ----
+
+const activeTraitsEl = document.getElementById("active-traits");
+
+function renderActiveTraits() {
+  // Each unit type only counts once per trait, however many copies are on the grid.
+  const uniqueTypes = new Set(grid.filter(Boolean).map((unit) => unit.type));
+  const counts = {};
+  uniqueTypes.forEach((type) => {
+    type.traits.forEach((traitId) => {
+      counts[traitId] = (counts[traitId] || 0) + 1;
+    });
+  });
+
+  const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  activeTraitsEl.innerHTML = "";
+
+  if (entries.length === 0) {
+    const empty = document.createElement("li");
+    empty.className = "traits-empty";
+    empty.textContent = "Place units on your grid to see their traits.";
+    activeTraitsEl.appendChild(empty);
+    return;
+  }
+
+  entries.forEach(([traitId, count]) => {
+    const trait = TRAITS[traitId];
+    const li = document.createElement("li");
+    li.className = "active-trait";
+    if (count < TRAIT_MILESTONES[0]) li.classList.add("inactive");
+
+    const icon = document.createElement("img");
+    icon.className = "trait-icon";
+    icon.src = trait.icon;
+    icon.alt = "";
+
+    const countEl = document.createElement("span");
+    countEl.className = "trait-count";
+    countEl.textContent = count;
+    countEl.title = `${count} unique unit${count === 1 ? "" : "s"}`;
+
+    const name = document.createElement("span");
+    name.className = "trait-name";
+    name.textContent = trait.name;
+
+    const milestones = document.createElement("div");
+    milestones.className = "trait-milestones";
+    TRAIT_MILESTONES.forEach((milestone, i) => {
+      if (i > 0) milestones.append(" / ");
+      const m = document.createElement("span");
+      m.textContent = milestone;
+      if (count >= milestone) m.classList.add("reached");
+      milestones.appendChild(m);
+    });
+
+    li.append(icon, countEl, name, milestones);
+    activeTraitsEl.appendChild(li);
   });
 }
 
