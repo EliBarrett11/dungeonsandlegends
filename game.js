@@ -60,3 +60,161 @@ document.getElementById("new-game-btn").addEventListener("click", () => {
   renderSlots();
   showScreen(lobby);
 });
+
+// ---- Player Screen ----
+
+const GRID_ROWS = 7;
+const GRID_COLS = 3;
+const BENCH_SIZE = 5;
+
+const UNIT_TYPES = {
+  "DL-001": { id: "DL-001", image: "assets/units/DL-001.png" },
+};
+
+const playerScreen = document.getElementById("player-screen");
+const teamGrid = document.getElementById("team-grid");
+const benchEl = document.getElementById("bench");
+
+// Each cell holds a unit or null. Locations are { area: "grid" | "bench", index }.
+const grid = new Array(GRID_ROWS * GRID_COLS).fill(null);
+const bench = new Array(BENCH_SIZE).fill(null);
+const areas = { grid, bench };
+
+function createUnit(typeId) {
+  return { type: UNIT_TYPES[typeId] };
+}
+
+function buildCells(container, area, count) {
+  container.innerHTML = "";
+  for (let i = 0; i < count; i++) {
+    const cell = document.createElement("div");
+    cell.className = `cell ${area}-cell`;
+    cell.dataset.area = area;
+    cell.dataset.index = i;
+    container.appendChild(cell);
+  }
+}
+
+function renderUnits() {
+  document.querySelectorAll(".cell").forEach((cell) => {
+    cell.innerHTML = "";
+    const unit = areas[cell.dataset.area][cell.dataset.index];
+    if (!unit) return;
+
+    const unitEl = document.createElement("div");
+    unitEl.className = "unit";
+    const img = document.createElement("img");
+    img.src = unit.type.image;
+    img.alt = unit.type.id;
+    img.draggable = false;
+    unitEl.appendChild(img);
+    unitEl.addEventListener("pointerdown", (e) => startDrag(e, cell));
+    cell.appendChild(unitEl);
+  });
+}
+
+// Pointer-based drag and drop so it works with both mouse and touch.
+let drag = null;
+
+function startDrag(e, fromCell) {
+  e.preventDefault();
+  const unit = areas[fromCell.dataset.area][fromCell.dataset.index];
+
+  const ghost = document.createElement("img");
+  ghost.className = "drag-ghost";
+  ghost.src = unit.type.image;
+  document.body.appendChild(ghost);
+
+  drag = { from: fromCell, ghost };
+  fromCell.classList.add("dragging-from");
+  moveGhost(e);
+
+  document.addEventListener("pointermove", onDragMove);
+  document.addEventListener("pointerup", onDragEnd);
+  document.addEventListener("pointercancel", onDragEnd);
+}
+
+function moveGhost(e) {
+  drag.ghost.style.left = `${e.clientX}px`;
+  drag.ghost.style.top = `${e.clientY}px`;
+}
+
+// Browser hit-testing on the 3D-tilted grid is unreliable, so find the cell
+// whose on-screen box contains the point (closest centre wins on overlap).
+function cellAtPoint(x, y) {
+  let best = null;
+  let bestDist = Infinity;
+  document.querySelectorAll(".cell").forEach((cell) => {
+    const r = cell.getBoundingClientRect();
+    if (x < r.left || x > r.right || y < r.top || y > r.bottom) return;
+    const dist = Math.hypot(x - (r.left + r.width / 2), y - (r.top + r.height / 2));
+    if (dist < bestDist) {
+      best = cell;
+      bestDist = dist;
+    }
+  });
+  return best;
+}
+
+function onDragMove(e) {
+  moveGhost(e);
+  document.querySelectorAll(".cell.drop-target").forEach((c) => c.classList.remove("drop-target"));
+  const target = cellAtPoint(e.clientX, e.clientY);
+  if (target) target.classList.add("drop-target");
+}
+
+function onDragEnd(e) {
+  document.removeEventListener("pointermove", onDragMove);
+  document.removeEventListener("pointerup", onDragEnd);
+  document.removeEventListener("pointercancel", onDragEnd);
+
+  const target = e.type === "pointerup" ? cellAtPoint(e.clientX, e.clientY) : null;
+  if (target && target !== drag.from) {
+    // Move into an empty cell, or swap with the unit already there.
+    const fromArea = areas[drag.from.dataset.area];
+    const toArea = areas[target.dataset.area];
+    const fromIndex = drag.from.dataset.index;
+    const toIndex = target.dataset.index;
+    [fromArea[fromIndex], toArea[toIndex]] = [toArea[toIndex], fromArea[fromIndex]];
+  }
+
+  drag.ghost.remove();
+  document.querySelectorAll(".dragging-from, .drop-target").forEach((c) => {
+    c.classList.remove("dragging-from", "drop-target");
+  });
+  drag = null;
+  renderUnits();
+}
+
+// The tilted grid's on-screen size differs from its layout size, so size the
+// board area to match what is actually drawn.
+function fitBoard() {
+  const area = document.querySelector(".board-area");
+  const stage = document.querySelector(".board-stage");
+  stage.style.top = "0px";
+  const stageRect = stage.getBoundingClientRect();
+  const gridRect = teamGrid.getBoundingClientRect();
+  stage.style.top = `${stageRect.top - gridRect.top}px`;
+  area.style.height = `${gridRect.height}px`;
+}
+
+window.addEventListener("resize", () => {
+  if (!playerScreen.classList.contains("hidden")) fitBoard();
+});
+
+function openPlayerScreen() {
+  const me = slots.find((s) => s.type === "human");
+  document.getElementById("player-name").textContent = (me && me.name.trim()) || "Player 1";
+
+  grid.fill(null);
+  bench.fill(null);
+  grid[0] = createUnit("DL-001");
+
+  buildCells(teamGrid, "grid", GRID_ROWS * GRID_COLS);
+  buildCells(benchEl, "bench", BENCH_SIZE);
+  renderUnits();
+  showScreen(playerScreen);
+  fitBoard();
+}
+
+document.getElementById("start-match-btn").addEventListener("click", openPlayerScreen);
