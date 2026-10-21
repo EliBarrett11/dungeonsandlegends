@@ -20,6 +20,13 @@
 
   <main id="player-screen" class="screen hidden">
     <h2 id="player-name" class="player-name"></h2>
+    <div class="renown">
+      <div class="renown-level">Renown <span id="renown-level">1</span></div>
+      <div class="fame-progress">
+        <div class="fame-bar"><div id="fame-fill" class="fame-fill"></div></div>
+        <div id="fame-text" class="fame-text"></div>
+      </div>
+    </div>
     <div class="player-layout">
       <aside class="standings">
         <h3 class="standings-title">Players</h3>
@@ -45,6 +52,16 @@
           </div>
         </header>
         <ol id="shop" class="shop"></ol>
+        <div class="bard">
+          <img class="bard-icon" src="assets/icons/bard.svg" alt="">
+          <div class="bard-info">
+            <div class="bard-name">The Bard</div>
+            <div class="bard-offer">
+              +4 <img src="assets/icons/fame.svg" alt=""> Fame for 4 <img src="assets/icons/gold.svg" alt=""> Gold
+            </div>
+          </div>
+          <button id="bard-btn" class="bard-button">Play my song</button>
+        </div>
       </aside>
     </div>
   </main>

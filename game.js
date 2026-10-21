@@ -91,6 +91,13 @@ const UNIT_TYPES = {
 
 const STARTING_GOLD = 3;
 const STARTING_HEALTH = 100;
+
+// Fame needed to go from each Renown level to the next.
+const FAME_TO_NEXT_LEVEL = {
+  1: 2,
+};
+
+const BARD_SONG = { fame: 4, cost: 4 };
 const SHOP_SIZE = 5;
 
 const playerScreen = document.getElementById("player-screen");
@@ -260,6 +267,7 @@ const shop = new Array(SHOP_SIZE).fill(null);
 
 function renderGold() {
   goldEl.textContent = gold;
+  renderBard();
 }
 
 function renderShop() {
@@ -336,6 +344,50 @@ function buyUnit(shopIndex) {
   renderUnits();
 }
 
+// ---- Renown & Fame ----
+
+const renownLevelEl = document.getElementById("renown-level");
+const fameFillEl = document.getElementById("fame-fill");
+const fameTextEl = document.getElementById("fame-text");
+const bardBtn = document.getElementById("bard-btn");
+
+let renown = 1;
+let fame = 0;
+
+function gainFame(amount) {
+  fame += amount;
+  while (FAME_TO_NEXT_LEVEL[renown] && fame >= FAME_TO_NEXT_LEVEL[renown]) {
+    fame -= FAME_TO_NEXT_LEVEL[renown];
+    renown++;
+  }
+}
+
+function renderRenown() {
+  renownLevelEl.textContent = renown;
+  const needed = FAME_TO_NEXT_LEVEL[renown];
+  if (needed) {
+    fameFillEl.style.width = `${(fame / needed) * 100}%`;
+    fameTextEl.textContent = `${fame} / ${needed} Fame to reach level ${renown + 1}`;
+  } else {
+    fameFillEl.style.width = "0%";
+    fameTextEl.textContent = `${fame} Fame`;
+  }
+}
+
+function renderBard() {
+  bardBtn.disabled = gold < BARD_SONG.cost;
+  bardBtn.title = bardBtn.disabled ? "Not enough gold" : "";
+}
+
+bardBtn.addEventListener("click", () => {
+  if (gold < BARD_SONG.cost) return;
+  gold -= BARD_SONG.cost;
+  gainFame(BARD_SONG.fame);
+  renderGold();
+  renderShop();
+  renderRenown();
+});
+
 // The tilted grid's on-screen size differs from its layout size, so size the
 // board area to match what is actually drawn.
 function fitBoard() {
@@ -363,12 +415,15 @@ function openPlayerScreen() {
   grid[0] = createUnit("DL-001");
   shop.fill(UNIT_TYPES["DL-001"]);
   gold = STARTING_GOLD;
+  renown = 1;
+  fame = 0;
 
   buildCells(teamGrid, "grid", GRID_ROWS * GRID_COLS);
   buildCells(benchEl, "bench", BENCH_SIZE);
   renderUnits();
   renderGold();
   renderShop();
+  renderRenown();
   showScreen(playerScreen);
   fitBoard();
 }
