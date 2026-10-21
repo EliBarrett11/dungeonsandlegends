@@ -90,6 +90,7 @@ const UNIT_TYPES = {
 };
 
 const STARTING_GOLD = 3;
+const STARTING_HEALTH = 100;
 const SHOP_SIZE = 5;
 
 const playerScreen = document.getElementById("player-screen");
@@ -208,6 +209,47 @@ function onDragEnd(e) {
   renderShop();
 }
 
+// ---- Lobby player health ----
+
+const standingsEl = document.getElementById("standings-list");
+
+let players = [];
+
+function createPlayers() {
+  players = slots.map((slot, i) => ({
+    name: slot.type === "human" ? slot.name.trim() || `Player ${i + 1}` : `Computer ${i + 1}`,
+    type: slot.type,
+    health: STARTING_HEALTH,
+  }));
+}
+
+function renderStandings(me) {
+  standingsEl.innerHTML = "";
+  players.forEach((player) => {
+    const li = document.createElement("li");
+    li.className = `standing ${player.type}`;
+    if (player === me) li.classList.add("me");
+
+    const name = document.createElement("span");
+    name.className = "standing-name";
+    name.textContent = player.name;
+
+    const health = document.createElement("span");
+    health.className = "standing-health";
+    health.textContent = `♥ ${player.health}`;
+
+    const bar = document.createElement("div");
+    bar.className = "health-bar";
+    const fill = document.createElement("div");
+    fill.className = "health-fill";
+    fill.style.width = `${(player.health / STARTING_HEALTH) * 100}%`;
+    bar.appendChild(fill);
+
+    li.append(name, health, bar);
+    standingsEl.appendChild(li);
+  });
+}
+
 // ---- The Tavern (shop) ----
 
 const shopEl = document.getElementById("shop");
@@ -311,8 +353,10 @@ window.addEventListener("resize", () => {
 });
 
 function openPlayerScreen() {
-  const me = slots.find((s) => s.type === "human");
-  document.getElementById("player-name").textContent = (me && me.name.trim()) || "Player 1";
+  createPlayers();
+  const me = players.find((p) => p.type === "human") || players[0];
+  document.getElementById("player-name").textContent = me.name;
+  renderStandings(me);
 
   grid.fill(null);
   bench.fill(null);

@@ -419,3 +419,77 @@ body {
   width: 20px;
   height: 20px;
 }
+
+/* ---- Lobby player health ---- */
+
+.standings {
+  width: min(100%, 230px);
+  padding: 0.9rem;
+  background: rgba(30, 22, 40, 0.85);
+  border: 3px solid #7a5a2a;
+  border-radius: 10px;
+}
+
+.standings-title {
+  font-size: 1.3rem;
+  color: #e8c66a;
+  margin-bottom: 0.6rem;
+}
+
+.standings-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.standing {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.2rem 0.5rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.standing.me {
+  border-color: #e8c66a;
+  background: rgba(232, 198, 106, 0.12);
+}
+
+.standing-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.standing.ai .standing-name {
+  color: #b5acd0;
+}
+
+.standing-health {
+  color: #ff8a8a;
+  font-weight: bold;
+}
+
+.health-bar {
+  grid-column: 1 / -1;
+  height: 5px;
+  background: #3a1d22;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.health-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #b8323a, #e65a5a);
+}
+
+/* On narrow screens keep the board first. */
+@media (max-width: 700px) {
+  .standings {
+    order: 2;
+    width: min(100%, 340px);
+  }
+}
